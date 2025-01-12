@@ -11,7 +11,15 @@
   <link rel="stylesheet" href="style.css">
   <title>World Peas - Basket</title>
   <style>
+    .error-message {
+      color: red;
+      font-size: 0.9rem;
+    }
 
+    .success-message {
+      color: green;
+      font-size: 0.9rem;
+    }
   </style>
 </head>
 
@@ -73,6 +81,10 @@
             <p id="subtotal">$27.44</p>
           </div>
           <div class="d-flex justify-content-between">
+            <p>Discount</p>
+            <p id="discount">$0.00</p>
+          </div>
+          <div class="d-flex justify-content-between">
             <p>Shipping</p>
             <p>$3.99</p>
           </div>
@@ -89,31 +101,55 @@
         </div>
         <div class="promocode mt-3">
           <label for="promocode">Enter Promocode:</label>
-          <input type="text" id="promocode-input" class="form-control" maxlength="5">
-          <button class="btn btn-secondary mt-2" id="apply-promocode">Submit</button>
+          <input type="text" id="promocode-input" class="form-control" maxlength="10">
+          <button class="btn btn-secondary mt-2" id="apply-promocode">Apply</button>
+          <p id="message" class="mt-2"></p>
         </div>
       </div>
     </div>
   </div>
 
   <script>
+    let promoUsed = false;
+
     document.getElementById('apply-promocode').addEventListener('click', function () {
-      const promoCode = document.getElementById('promocode-input').value.trim();
+      const promoCode = document.getElementById('promocode-input').value.trim().toLowerCase();
       const subtotalElement = document.getElementById('subtotal');
+      const discountElement = document.getElementById('discount');
       const totalElement = document.getElementById('total');
+      const messageElement = document.getElementById('message');
 
-      if (promoCode === 'Ostad' || promoCode === 'ostad') {
-        const subtotal = 27.44; // Original subtotal
-        const discount = subtotal * 0.1; // 10% discount
-        const newSubtotal = subtotal - discount;
-        const total = newSubtotal + 3.99 + 2.00; // New total with shipping and tax
+      const subtotal = 27.44; // Original subtotal
+      let discount = 0;
 
-        subtotalElement.textContent = `$${newSubtotal.toFixed(2)}`;
-        totalElement.textContent = `$${total.toFixed(2)}`;
-        alert('Promo code applied! 10% discount has been added.');
-      } else {
-        alert('Invalid promo code. Please try again.');
+      if (promoUsed) {
+        messageElement.textContent = 'Promo code has already been applied.';
+        messageElement.className = 'error-message';
+        return;
       }
+
+      if (promoCode === 'ostad10') {
+        discount = subtotal * 0.1; // 10% discount
+        promoUsed = true;
+        messageElement.textContent = 'Promo code applied! 10% discount has been added.';
+        messageElement.className = 'success-message';
+      } else if (promoCode === 'ostad5') {
+        discount = subtotal * 0.05; // 5% discount
+        promoUsed = true;
+        messageElement.textContent = 'Promo code applied! 5% discount has been added.';
+        messageElement.className = 'success-message';
+      } else {
+        messageElement.textContent = 'Invalid promo code. Please try again.';
+        messageElement.className = 'error-message';
+        return;
+      }
+
+      const newSubtotal = subtotal - discount;
+      const total = newSubtotal + 3.99 + 2.00; // New total with shipping and tax
+
+      discountElement.textContent = `-$${discount.toFixed(2)}`;
+      subtotalElement.textContent = `$${subtotal.toFixed(2)}`;
+      totalElement.textContent = `$${total.toFixed(2)}`;
     });
   </script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
